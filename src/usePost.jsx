@@ -9,7 +9,7 @@ function usePost(type,key) {
     const query=useMutation({mutationFn:async(data)=>{
 console.log("aas");
 console.log(data);
-
+abort_ref.current=new AbortController();
       const signal=abort_ref.current.signal ;   
    let time=  setTimeout(() => {
             abort_ref.current.abort("took too long")
@@ -26,12 +26,14 @@ form.append("name",data.name);
 form.append("email",data.email);
 form.append("password",data.password);
 form.append("pic",data.pic[0]);
- let get=await fetch(url,{method:"POST",body:form});
+ let get=await fetch(url,{signal,method:"POST",body:form});
 if(!get.ok){let conv=await get.json();throw new Error(conv||"error in registration")};
 clearTimeout(time);
 return await get.json()};
 
 case "signIn":
+  console.log("sign req",data);
+  
   url=`http://localhost:4700/api/signIn`
   let get=await fetch(url,{signal,method:"POST",body:JSON.stringify(data),headers:{"Content-type":"Application/json"},credentials:"include"})
   let conv=await get.json();
@@ -43,6 +45,8 @@ case "signIn":
 
 
 
+    },onError:(err)=>{console.log(error);
+    },onSuccess:(data)=>{console.log(data);
     }})
 
   return query

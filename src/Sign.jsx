@@ -6,7 +6,7 @@ import usePost from "./usePost";
 const Sign=()=>{
 
 let [reg,setReg]=useState(true);
-let {isSuccess,isPaused,isPending,mutate}=usePost(reg?"register":"sign");
+let {isSuccess,isPaused,isPending,mutate,isError,error}=usePost(reg?"register":"signIn");
 
 
 console.log("re rendered");
@@ -18,7 +18,8 @@ let {errors}=formState;
 const ref_fnx=useCallback((x)=>{ 
 ;ref.current=x;register("password").ref(x) 
 },[])
-
+useEffect(()=>{isError&&console.log(error,error.message);
+},[isError,error])
     useEffect(()=>{console.log(errors);
     },[errors])
 return(
@@ -35,7 +36,8 @@ return(
       <span className='text-gray-400 hover:pointer absolute top-0 hover:border-white hover:text-white hover:scale-99 cursor-pointer transition-all duration-300 border-purple-700 inline-block mb-5 rounded-full p-3 top-5 ml-0 border-1 rounded-full' >Back</span>
         <div className="flex items-center justify-center mb-6">
           <button
-            onClick={()=>{setReg((x)=>{return false})}}
+            onClick={()=>{console.log("click rendering");
+            ;setReg((x)=>{return false})}}
             className={`w-1/3 pb-4 font-medium text-center  cursor-pointer scale-98 hover:scale-99 hover:border-white capitalize border-b-2 transition`}
           >
             Sign In
