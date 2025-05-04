@@ -31,15 +31,22 @@ if(!get.ok){let conv=await get.json();throw new Error(conv||"error in registrati
 clearTimeout(time);
 return await get.json()};
 
-case "signIn":
+case "signIn":{
   console.log("sign req",data);
   
   url=`http://localhost:4700/api/signIn`
   let get=await fetch(url,{signal,method:"POST",body:JSON.stringify(data),headers:{"Content-type":"Application/json"},credentials:"include"})
   let conv=await get.json();
   if(!get.ok){throw new Error(conv||"error in signIn")};
-  return conv;
+  return conv};
 
+  case "refresh":
+{
+  url=`http://localhost:4700/api/refresh`
+  let get=await fetch(url,{signal,method:"POST",headers:{"Content-type":"Application/json"},credentials:"include"})
+  let conv=await get.json();
+  if(!get.ok){throw new Error(conv||"error in refresh")};
+  return conv;}
       };
 
 
