@@ -1,14 +1,16 @@
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import React, { useEffect, useRef } from 'react'
 
+
 function usePost(type,key) {
+// console.log("usePost called",type);
 
     const abort_ref=useRef(new AbortController());
-//  
+const client=useQueryClient();
 
     const query=useMutation({mutationFn:async(data)=>{
-console.log("aas");
-console.log(data);
+// console.log("aas");
+// console.log(data);
 abort_ref.current=new AbortController();
       const signal=abort_ref.current.signal ;   
    let time=  setTimeout(() => {
@@ -46,17 +48,57 @@ case "signIn":{
   let get=await fetch(url,{signal,method:"POST",headers:{"Content-type":"Application/json"},credentials:"include"})
   let conv=await get.json();
   if(!get.ok){throw new Error(conv||"error in refresh")};
-  return conv;}
+  return conv;};
+
+  case "insert":{
+    // console.log(key);
+    
+url=`http://localhost:4700/api/${key}`;console.log("req in insert recieved");
+
+let get=await fetch(url,{method:"POST",headers:{"Content-type":"Application/json"},body:JSON.stringify(data)})
+let conv=await get.json();
+if(!get.ok){  throw new Error(conv.msg||"error in insert")};
+return conv
+
+  };
+  case "edit":{
+   
+    
+const get=await fetch(`http://localhost:4700/api/${key}?id=${data.key}`,{method:"PUT",headers:{"Content-type":"Application/json"},body:JSON.stringify(data.data)});
+const conv=await get.json();
+
+if(!get.ok){
+  throw new Error(conv||conv.msg||"error in edit");
+};
+return conv;
+
+  };
+case "delete":{
+console.log(type,key);
+
+  let get=await fetch(`http://localhost:4700/api/${key}?id=${data.id}&page=${data.page}`,{method:"DELETE"});
+  let conv=await get.json();
+  if(!get.ok){throw new Error(conv||conv.msg||"error in delete")};
+  return conv;
+
+}
+
       };
 
 
 
 
-    },onError:(err)=>{console.log(error);
-    },onSuccess:(data)=>{console.log(data);
+    },onError:(err)=>{
+    },onSuccess:(x)=>{
+    console.log(x);
+    
+      if(type=="delete"){
+        client.refetchQueries({queryKey:[type],predicate:(query)=>{console.log(query);query.queryKey.includes(x.page)
+        }});
+      }
     }})
 
   return query
 }
 
-export default usePost
+export default  usePost;

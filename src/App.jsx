@@ -2,24 +2,24 @@
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
-import Sign from './Sign';
+
 import Main_Routes from './Main_Routes';
 
+import Home from './Home';
+import { useEffect, useState } from 'react';
+import Nav from './Nav';
 
 
 
 function App() {
 
-
-
-
-
-
   
   return (
   
 <div>
-<Main_Routes/>
+ <Nav/>
+<Main_Routes/>;
+
   </div>
 
 
@@ -28,3 +28,4 @@ function App() {
 }
 
 export default App
+

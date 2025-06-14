@@ -2,22 +2,24 @@ import { DevTool } from "@hookform/devtools";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import usePost from "./usePost";
+import { Outlet, useNavigate } from "react-router-dom";
 
 const Sign=()=>{
-
+let  nav=useNavigate();
 let [reg,setReg]=useState(true);
 let {isSuccess,isPaused,isPending,mutate,isError,error}=usePost(reg?"register":"signIn");
 
 
-console.log("re rendered");
+console.log("sign re rendered");
 
-let {register,handleSubmit,formState,control}=useForm({defaultValues:{name:'',email:'',password:'',pic:null},mode:"all"});
-let ref=useRef(null);
+let {register,handleSubmit,formState,control,watch,getValues}=useForm({defaultValues:{name:'',email:'',password:'',pic:null},mode:"all"});
+// let pass=watch("password");
+// useEffect(()=>{console.log(pass);
+// },[pass])
+
 let {errors}=formState;
 
-const ref_fnx=useCallback((x)=>{ 
-;ref.current=x;register("password").ref(x) 
-},[])
+
 useEffect(()=>{isError&&console.log(error,error.message);
 },[isError,error])
     useEffect(()=>{console.log(errors);
@@ -29,11 +31,11 @@ return(
 
   
 <div className='flex justify-center items-center h-250  text-[#D3D3D3] p-6 ' >
-      
+       <button className='border-2 border-red-900 ' onClick={()=>{nav("/sign/schema")}}>Add</button>
       <section className="shadow-2xl rounded-2xl p-8 relative w-full bg-gray-900 max-w-md border border-[#A9A9A9] text-[#D3D3D3]">
       
       <h1 className='text-xl font-bold w-50 m-auto mb-10 text-center'>{"User SignUp"}</h1>
-      <span className='text-gray-400 hover:pointer absolute top-0 hover:border-white hover:text-white hover:scale-99 cursor-pointer transition-all duration-300 border-purple-700 inline-block mb-5 rounded-full p-3 top-5 ml-0 border-1 rounded-full' >Back</span>
+      <span className='text-gray-400 hover:pointer absolute top-0 hover:border-white hover:text-white hover:scale-99 cursor-pointer transition-all duration-300 border-purple-700 inline-block mb-5 rounded-full p-3 top-5 ml-0 border-1 rounded-full'onClick={()=>{nav("/")}} >Back</span>
         <div className="flex items-center justify-center mb-6">
           <button
             onClick={()=>{console.log("click rendering");
@@ -92,8 +94,8 @@ return(
 
           <div className="relative">
             <input
-            {...register("password",{required:"Must present",validate:(value)=>{ value.length<8?"Must have atleast 8 characters or numbers":true }})}
-            ref={(e)=> ref_fnx(e)}
+            {...register("password",{required:"Must present",validate:(value)=>{return value.length<8?"Must have atleast 8 characters or numbers":true }})}
+           
               type="password"
               placeholder="Password"
               className="w-full py-3 pl-4 pr-4 text-[#D3D3D3] bg-transparent border border-[#A9A9A9] rounded-lg shadow-sm focus:ring-2 focus:ring-[#A9A9A9] focus:outline-none placeholder-[#A9A9A9]"
@@ -105,7 +107,7 @@ return(
           {reg&&
             <div className="relative">
               <input
-              {...register("confirmPass",{required:"Must be present",validate:(value)=>{ if(value==ref?.current?.value){return true}else{return "must be similar to the password"}  }})}
+              {...register("confirmPass",{required:"Must be present",validate:(value)=>{if(value==getValues("password")){return true}else {return "value must be similar to password"}}})}
                 type="password"
                 placeholder="Confirm Password"
                 className="w-full py-3 pl-4 pr-4 text-[#D3D3D3] bg-transparent border border-[#A9A9A9] rounded-lg shadow-sm focus:ring-2 focus:ring-[#A9A9A9] focus:outline-none placeholder-[#A9A9A9]"
@@ -126,10 +128,10 @@ return(
           </div>
           <p className='text-white'></p>
         </form>
-       <DevTool control={control}/>
+       {/* <DevTool control={control}/> */}
       </section>
     </div>
-  
+  <Outlet/>
   </div>      
 
 
@@ -140,4 +142,4 @@ return(
 
 
 }
-export default Sign
+export default React.memo( Sign)
